@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: n8n-main-service
+  namespace: {{ .Values.global.namespace }}
+spec:
+  type: {{ .Values.main.service.type }}
+  selector:
+    app: n8n-main
+  ports:
+  - name: http
+    port: {{ .Values.main.service.port }}
+    targetPort: {{ .Values.main.service.targetPort }}
+  - name: metrics
+    port: {{ .Values.main.service.metricsPort }}
+    targetPort: {{ .Values.main.service.targetPort }}

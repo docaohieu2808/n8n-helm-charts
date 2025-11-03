@@ -1,0 +1,67 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: n8n-config
+  namespace: {{ .Values.global.namespace }}
+data:
+  # Basic config
+  N8N_HOST: {{ .Values.config.host | quote }}
+  N8N_PORT: {{ .Values.config.port | quote }}
+  N8N_PROTOCOL: {{ .Values.config.protocol | quote }}
+  WEBHOOK_URL: {{ .Values.config.webhookUrl | quote }}
+  GENERIC_TIMEZONE: {{ .Values.config.timezone | quote }}
+
+  # Database config (PostgreSQL HA)
+  DB_TYPE: {{ .Values.config.database.type | quote }}
+  DB_POSTGRESDB_HOST: {{ .Values.config.database.host | quote }}
+  DB_POSTGRESDB_PORT: {{ .Values.config.database.port | quote }}
+  DB_POSTGRESDB_DATABASE: {{ .Values.config.database.name | quote }}
+  DB_POSTGRESDB_USER: {{ .Values.config.database.user | quote }}
+  DB_POSTGRESDB_SCHEMA: {{ .Values.config.database.schema | quote }}
+  # Connection Pool Optimization
+  DB_POSTGRESDB_POOL_SIZE: {{ .Values.config.database.poolSize | quote }}
+  DB_POSTGRESDB_MIN_POOL_SIZE: {{ .Values.config.database.minPoolSize | quote }}
+  DB_POSTGRESDB_ACQUIRE_TIMEOUT_MILLIS: {{ .Values.config.database.acquireTimeoutMillis | quote }}
+  DB_POSTGRESDB_CONNECTION_TIMEOUT_MILLIS: {{ .Values.config.database.connectionTimeoutMillis | quote }}
+  DB_POSTGRESDB_IDLE_TIMEOUT_MILLIS: {{ .Values.config.database.idleTimeoutMillis | quote }}
+  DB_POSTGRESDB_MAX_USES: {{ .Values.config.database.maxUses | quote }}
+  # SSL enabled (required by PostgreSQL server)
+  DB_POSTGRESDB_SSL_ENABLED: {{ .Values.config.database.sslEnabled | quote }}
+  DB_POSTGRESDB_SSL_REJECT_UNAUTHORIZED: {{ .Values.config.database.sslRejectUnauthorized | quote }}
+  NODE_TLS_REJECT_UNAUTHORIZED: {{ .Values.config.nodeTlsRejectUnauthorized | quote }}
+
+  # Redis config for queue mode (Redis HA)
+  QUEUE_BULL_REDIS_HOST: {{ .Values.config.redis.host | quote }}
+  QUEUE_BULL_REDIS_PORT: {{ .Values.config.redis.port | quote }}
+  QUEUE_BULL_REDIS_DB: {{ .Values.config.redis.queueDb | quote }}
+
+  # Execution config
+  EXECUTIONS_MODE: {{ .Values.config.executions.mode | quote }}
+  EXECUTIONS_DATA_SAVE_ON_ERROR: {{ .Values.config.executions.dataSaveOnError | quote }}
+  EXECUTIONS_DATA_SAVE_ON_SUCCESS: {{ .Values.config.executions.dataSaveOnSuccess | quote }}
+  EXECUTIONS_DATA_SAVE_MANUAL_EXECUTIONS: {{ .Values.config.executions.dataSaveManualExecutions | quote }}
+  EXECUTIONS_DATA_PRUNE: {{ .Values.config.executions.dataPresne | quote }}
+  EXECUTIONS_DATA_MAX_AGE: {{ .Values.config.executions.dataMaxAge | quote }}
+
+  # Logging
+  N8N_LOG_LEVEL: {{ .Values.config.logging.level | quote }}
+  N8N_LOG_OUTPUT: {{ .Values.config.logging.output | quote }}
+
+  # Metrics
+  N8N_METRICS: {{ .Values.config.metrics.enabled | quote }}
+  N8N_METRICS_INCLUDE_DEFAULT_METRICS: {{ .Values.config.metrics.includeDefaultMetrics | quote }}
+  N8N_METRICS_INCLUDE_WORKFLOW_ID_LABEL: {{ .Values.config.metrics.includeWorkflowIdLabel | quote }}
+  N8N_METRICS_INCLUDE_NODE_TYPE_LABEL: {{ .Values.config.metrics.includeNodeTypeLabel | quote }}
+
+  # Performance
+  N8N_CONCURRENCY_PRODUCTION_LIMIT: {{ .Values.config.concurrencyProductionLimit | quote }}
+
+  # Caching (improves response time)
+  N8N_CACHE_ENABLED: {{ .Values.config.cache.enabled | quote }}
+  N8N_USER_MANAGEMENT_JWT_SECRET_CACHE_ENABLED: {{ .Values.config.cache.jwtCacheEnabled | quote }}
+  CACHE_REDIS_HOST: {{ .Values.config.redis.host | quote }}
+  CACHE_REDIS_PORT: {{ .Values.config.redis.port | quote }}
+  CACHE_REDIS_DB: {{ .Values.config.redis.cacheDb | quote }}
+
+  # Trust proxy for reverse proxy (use number for Express)
+  N8N_TRUST_PROXY: {{ .Values.config.trustProxy | quote }}

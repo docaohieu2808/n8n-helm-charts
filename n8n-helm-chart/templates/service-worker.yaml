@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: n8n-worker-service
+  namespace: {{ .Values.global.namespace }}
+spec:
+  type: {{ .Values.worker.service.type }}
+  selector:
+    app: n8n-worker
+  ports:
+  - name: http
+    port: {{ .Values.worker.service.port }}
+    targetPort: {{ .Values.worker.service.targetPort }}

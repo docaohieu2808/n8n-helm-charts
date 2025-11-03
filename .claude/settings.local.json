@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(kubectl apply:*)",
+      "Bash(kubectl delete:*)",
+      "Bash(kubectl rollout status:*)",
+      "Bash(kubectl get:*)",
+      "Bash(kubectl logs:*)",
+      "Bash(kubectl exec:*)",
+      "Bash(helm lint:*)",
+      "Bash(helm package:*)",
+      "Bash(tree:*)",
+      "Bash(helm template:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

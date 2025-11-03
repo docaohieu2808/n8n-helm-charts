@@ -1,0 +1,911 @@
+---
+# n8n namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: n8n
+
+---
+# n8n-main persistent volume claim (using nfs-client dynamic provisioning)
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: n8n-main-pvc
+  namespace: n8n
+  labels:
+    app: n8n-main
+    tier: application
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: nfs-client
+  resources:
+    requests:
+      storage: 10Gi
+
+---
+# n8n-main deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: n8n-main
+  namespace: n8n
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: n8n-main
+  template:
+    metadata:
+      labels:
+        app: n8n-main
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - n8n-main
+              topologyKey: kubernetes.io/hostname
+      containers:
+      - name: n8n-main
+        image: n8nio/n8n:latest
+        ports:
+        - containerPort: 5678
+        command: ["n8n"]
+        args: ["start"]
+        env:
+        - name: N8N_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: N8N_HOST
+        - name: N8N_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: N8N_PORT
+        - name: N8N_PROTOCOL
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: N8N_PROTOCOL
+        - name: WEBHOOK_URL
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: WEBHOOK_URL
+        - name: GENERIC_TIMEZONE
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: GENERIC_TIMEZONE
+        - name: DB_TYPE
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: DB_TYPE
+        - name: DB_POSTGRESDB_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: DB_POSTGRESDB_HOST
+        - name: DB_POSTGRESDB_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: DB_POSTGRESDB_PORT
+        - name: DB_POSTGRESDB_DATABASE
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: DB_POSTGRESDB_DATABASE
+        - name: DB_POSTGRESDB_USER
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: DB_POSTGRESDB_USER
+        - name: DB_POSTGRESDB_SCHEMA
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: DB_POSTGRESDB_SCHEMA
+        - name: DB_POSTGRESDB_POOL_SIZE
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: DB_POSTGRESDB_POOL_SIZE
+        - name: DB_POSTGRESDB_MIN_POOL_SIZE
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: DB_POSTGRESDB_MIN_POOL_SIZE
+        - name: DB_POSTGRESDB_ACQUIRE_TIMEOUT_MILLIS
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: DB_POSTGRESDB_ACQUIRE_TIMEOUT_MILLIS
+        - name: DB_POSTGRESDB_CONNECTION_TIMEOUT_MILLIS
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: DB_POSTGRESDB_CONNECTION_TIMEOUT_MILLIS
+        - name: DB_POSTGRESDB_IDLE_TIMEOUT_MILLIS
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: DB_POSTGRESDB_IDLE_TIMEOUT_MILLIS
+        - name: DB_POSTGRESDB_MAX_USES
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: DB_POSTGRESDB_MAX_USES
+        - name: DB_POSTGRESDB_SSL_ENABLED
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: DB_POSTGRESDB_SSL_ENABLED
+        - name: DB_POSTGRESDB_SSL_REJECT_UNAUTHORIZED
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: DB_POSTGRESDB_SSL_REJECT_UNAUTHORIZED
+        - name: DB_POSTGRESDB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: n8n-secrets
+              key: POSTGRES_PASSWORD
+        - name: N8N_ENCRYPTION_KEY
+          valueFrom:
+            secretKeyRef:
+              name: n8n-secrets
+              key: N8N_ENCRYPTION_KEY
+        - name: EXECUTIONS_MODE
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: EXECUTIONS_MODE
+        - name: QUEUE_BULL_REDIS_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: QUEUE_BULL_REDIS_HOST
+        - name: QUEUE_BULL_REDIS_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: QUEUE_BULL_REDIS_PORT
+        - name: QUEUE_BULL_REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: n8n-secrets
+              key: REDIS_PASSWORD
+        - name: QUEUE_BULL_REDIS_DB
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: QUEUE_BULL_REDIS_DB
+        - name: EXECUTIONS_DATA_SAVE_ON_ERROR
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: EXECUTIONS_DATA_SAVE_ON_ERROR
+        - name: EXECUTIONS_DATA_SAVE_ON_SUCCESS
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: EXECUTIONS_DATA_SAVE_ON_SUCCESS
+        - name: EXECUTIONS_DATA_SAVE_MANUAL_EXECUTIONS
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: EXECUTIONS_DATA_SAVE_MANUAL_EXECUTIONS
+        - name: EXECUTIONS_DATA_PRUNE
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: EXECUTIONS_DATA_PRUNE
+        - name: EXECUTIONS_DATA_MAX_AGE
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: EXECUTIONS_DATA_MAX_AGE
+        - name: N8N_METRICS
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: N8N_METRICS
+        - name: N8N_CONCURRENCY_PRODUCTION_LIMIT
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: N8N_CONCURRENCY_PRODUCTION_LIMIT
+        - name: N8N_TRUST_PROXY
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: N8N_TRUST_PROXY
+        - name: N8N_CACHE_ENABLED
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: N8N_CACHE_ENABLED
+        - name: N8N_USER_MANAGEMENT_JWT_SECRET_CACHE_ENABLED
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: N8N_USER_MANAGEMENT_JWT_SECRET_CACHE_ENABLED
+        - name: CACHE_REDIS_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: CACHE_REDIS_HOST
+        - name: CACHE_REDIS_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: CACHE_REDIS_PORT
+        - name: CACHE_REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: n8n-secrets
+              key: REDIS_PASSWORD
+        - name: CACHE_REDIS_DB
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: CACHE_REDIS_DB
+        - name: NODE_TLS_REJECT_UNAUTHORIZED
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: NODE_TLS_REJECT_UNAUTHORIZED
+        volumeMounts:
+        - name: n8n-main-files
+          mountPath: /home/node/.n8n
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "1000m"
+          limits:
+            memory: "4Gi"
+            cpu: "2000m"
+        startupProbe:
+          httpGet:
+            path: /healthz
+            port: 5678
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 30
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 5678
+          initialDelaySeconds: 0
+          periodSeconds: 30
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 5678
+          initialDelaySeconds: 0
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+      volumes:
+      - name: n8n-main-files
+        persistentVolumeClaim:
+          claimName: n8n-main-pvc
+
+---
+# n8n-main service
+apiVersion: v1
+kind: Service
+metadata:
+  name: n8n-main-service
+  namespace: n8n
+spec:
+  selector:
+    app: n8n-main
+  ports:
+  - name: http
+    port: 80
+    targetPort: 5678
+  - name: metrics
+    port: 9090
+    targetPort: 5678
+
+---
+# n8n-config config map
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: n8n-config
+  namespace: n8n
+data:
+  # Basic config
+  N8N_HOST: "auto.docaohieu.com"
+  N8N_PORT: "5678"
+  N8N_PROTOCOL: "https"
+  WEBHOOK_URL: "https://auto.docaohieu.com"
+  GENERIC_TIMEZONE: "Asia/Ho_Chi_Minh"
+
+  # Database config (PostgreSQL HA)
+  DB_TYPE: "postgresdb"
+  DB_POSTGRESDB_HOST: "postgres-ha.database.svc.cluster.local"
+  DB_POSTGRESDB_PORT: "5432"
+  DB_POSTGRESDB_DATABASE: "n8n_postgres_db"
+  DB_POSTGRESDB_USER: "n8n_postgres_user"
+  DB_POSTGRESDB_SCHEMA: "public"
+  # Connection Pool Optimization
+  DB_POSTGRESDB_POOL_SIZE: "20"
+  DB_POSTGRESDB_MIN_POOL_SIZE: "5"
+  DB_POSTGRESDB_ACQUIRE_TIMEOUT_MILLIS: "10000"
+  DB_POSTGRESDB_CONNECTION_TIMEOUT_MILLIS: "5000"
+  DB_POSTGRESDB_IDLE_TIMEOUT_MILLIS: "30000"
+  DB_POSTGRESDB_MAX_USES: "7500"
+  # SSL enabled (required by PostgreSQL server)
+  DB_POSTGRESDB_SSL_ENABLED: "true"
+  DB_POSTGRESDB_SSL_REJECT_UNAUTHORIZED: "false"
+  NODE_TLS_REJECT_UNAUTHORIZED: "0"
+
+  # Redis config for queue mode (Redis HA)
+  QUEUE_BULL_REDIS_HOST: "redis-ha-haproxy.database.svc.cluster.local"
+  QUEUE_BULL_REDIS_PORT: "6379"
+  QUEUE_BULL_REDIS_DB: "1"
+
+  # Execution config
+  EXECUTIONS_MODE: "queue"
+  EXECUTIONS_DATA_SAVE_ON_ERROR: "all"
+  EXECUTIONS_DATA_SAVE_ON_SUCCESS: "none"
+  EXECUTIONS_DATA_SAVE_MANUAL_EXECUTIONS: "true"
+  EXECUTIONS_DATA_PRUNE: "true"
+  EXECUTIONS_DATA_MAX_AGE: "336"
+
+  # Logging
+  N8N_LOG_LEVEL: "warn"
+  N8N_LOG_OUTPUT: "console"
+
+  # Metrics
+  N8N_METRICS: "true"
+  N8N_METRICS_INCLUDE_DEFAULT_METRICS: "true"
+  N8N_METRICS_INCLUDE_WORKFLOW_ID_LABEL: "true"
+  N8N_METRICS_INCLUDE_NODE_TYPE_LABEL: "true"
+
+  # Performance
+  N8N_CONCURRENCY_PRODUCTION_LIMIT: "10"
+
+  # Caching (improves response time)
+  N8N_CACHE_ENABLED: "true"
+  N8N_USER_MANAGEMENT_JWT_SECRET_CACHE_ENABLED: "true"
+  CACHE_REDIS_HOST: "redis-ha-haproxy.database.svc.cluster.local"
+  CACHE_REDIS_PORT: "6379"
+  CACHE_REDIS_DB: "2"
+
+  # Trust proxy for reverse proxy (use number for Express)
+  N8N_TRUST_PROXY: "1"
+
+---
+# n8n-secrets secret
+apiVersion: v1
+kind: Secret
+metadata:
+  name: n8n-secrets
+  namespace: n8n
+type: Opaque
+stringData:
+  POSTGRES_PASSWORD: "zYaYeKf2CfVW1BuZ8o5vFWZBxRqf6eDLVIRkGK9M4V7LEtcCmPlJhZpDZgAYBuQ4"
+  POSTGRES_USER: "n8n_postgres_user"
+  POSTGRES_DB: "n8n_postgres_db"
+  N8N_ENCRYPTION_KEY: "54229fbc5059ba94d8d29665b3561b00915fed0441e8574a10e20532e46b5717"
+  REDIS_PASSWORD: "vqq0K67ONKCOuCIIMqQyyfeLANFqex4e8eI7AyVio5eUpuaULfenwIxW2I"
+  REDIS_ENCRYPTION_KEY: "082b643762a5d088cfaefc9f937e848dd26bef200615ae37d848b3e277263e65"
+
+---
+# n8n-workers deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: n8n-worker
+  namespace: n8n
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: n8n-worker
+  template:
+    metadata:
+      labels:
+        app: n8n-worker
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - n8n-worker
+              topologyKey: kubernetes.io/hostname
+      containers:
+      - name: n8n-worker
+        image: n8nio/n8n:latest
+        command: ["n8n"]
+        args: ["worker"]
+        env:
+        - name: GENERIC_TIMEZONE
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: GENERIC_TIMEZONE
+        - name: DB_TYPE
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: DB_TYPE
+        - name: DB_POSTGRESDB_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: DB_POSTGRESDB_HOST
+        - name: DB_POSTGRESDB_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: DB_POSTGRESDB_PORT
+        - name: DB_POSTGRESDB_DATABASE
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: DB_POSTGRESDB_DATABASE
+        - name: DB_POSTGRESDB_USER
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: DB_POSTGRESDB_USER
+        - name: DB_POSTGRESDB_SCHEMA
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: DB_POSTGRESDB_SCHEMA
+        - name: DB_POSTGRESDB_POOL_SIZE
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: DB_POSTGRESDB_POOL_SIZE
+        - name: DB_POSTGRESDB_MIN_POOL_SIZE
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: DB_POSTGRESDB_MIN_POOL_SIZE
+        - name: DB_POSTGRESDB_ACQUIRE_TIMEOUT_MILLIS
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: DB_POSTGRESDB_ACQUIRE_TIMEOUT_MILLIS
+        - name: DB_POSTGRESDB_CONNECTION_TIMEOUT_MILLIS
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: DB_POSTGRESDB_CONNECTION_TIMEOUT_MILLIS
+        - name: DB_POSTGRESDB_IDLE_TIMEOUT_MILLIS
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: DB_POSTGRESDB_IDLE_TIMEOUT_MILLIS
+        - name: DB_POSTGRESDB_MAX_USES
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: DB_POSTGRESDB_MAX_USES
+        - name: DB_POSTGRESDB_SSL_ENABLED
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: DB_POSTGRESDB_SSL_ENABLED
+        - name: DB_POSTGRESDB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: n8n-secrets
+              key: POSTGRES_PASSWORD
+        - name: N8N_ENCRYPTION_KEY
+          valueFrom:
+            secretKeyRef:
+              name: n8n-secrets
+              key: N8N_ENCRYPTION_KEY
+        - name: EXECUTIONS_MODE
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: EXECUTIONS_MODE
+        - name: QUEUE_BULL_REDIS_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: QUEUE_BULL_REDIS_HOST
+        - name: QUEUE_BULL_REDIS_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: QUEUE_BULL_REDIS_PORT
+        - name: QUEUE_BULL_REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: n8n-secrets
+              key: REDIS_PASSWORD
+        - name: QUEUE_BULL_REDIS_DB
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: QUEUE_BULL_REDIS_DB
+        - name: N8N_CONCURRENCY_PRODUCTION_LIMIT
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: N8N_CONCURRENCY_PRODUCTION_LIMIT
+        - name: NODE_TLS_REJECT_UNAUTHORIZED
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: NODE_TLS_REJECT_UNAUTHORIZED
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
+
+---
+# n8n-workers service
+apiVersion: v1
+kind: Service
+metadata:
+  name: n8n-worker-service
+  namespace: n8n
+spec:
+  selector:
+    app: n8n-worker
+  ports:
+    - name: http
+      port: 5678
+      targetPort: 5678
+
+---
+# n8n-webhook deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: n8n-webhook
+  namespace: n8n
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: n8n-webhook
+  template:
+    metadata:
+      labels:
+        app: n8n-webhook
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - n8n-webhook
+              topologyKey: kubernetes.io/hostname
+      containers:
+      - name: n8n-webhook
+        image: n8nio/n8n:latest
+        ports:
+        - containerPort: 5678
+        command: ["n8n"]
+        args: ["webhook"]
+        env:
+        - name: N8N_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: N8N_HOST
+        - name: N8N_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: N8N_PORT
+        - name: N8N_PROTOCOL
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: N8N_PROTOCOL
+        - name: WEBHOOK_URL
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: WEBHOOK_URL
+        - name: GENERIC_TIMEZONE
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: GENERIC_TIMEZONE
+        - name: DB_TYPE
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: DB_TYPE
+        - name: DB_POSTGRESDB_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: DB_POSTGRESDB_HOST
+        - name: DB_POSTGRESDB_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: DB_POSTGRESDB_PORT
+        - name: DB_POSTGRESDB_DATABASE
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: DB_POSTGRESDB_DATABASE
+        - name: DB_POSTGRESDB_USER
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: DB_POSTGRESDB_USER
+        - name: DB_POSTGRESDB_SCHEMA
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: DB_POSTGRESDB_SCHEMA
+        - name: DB_POSTGRESDB_POOL_SIZE
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: DB_POSTGRESDB_POOL_SIZE
+        - name: DB_POSTGRESDB_MIN_POOL_SIZE
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: DB_POSTGRESDB_MIN_POOL_SIZE
+        - name: DB_POSTGRESDB_ACQUIRE_TIMEOUT_MILLIS
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: DB_POSTGRESDB_ACQUIRE_TIMEOUT_MILLIS
+        - name: DB_POSTGRESDB_CONNECTION_TIMEOUT_MILLIS
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: DB_POSTGRESDB_CONNECTION_TIMEOUT_MILLIS
+        - name: DB_POSTGRESDB_IDLE_TIMEOUT_MILLIS
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: DB_POSTGRESDB_IDLE_TIMEOUT_MILLIS
+        - name: DB_POSTGRESDB_MAX_USES
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: DB_POSTGRESDB_MAX_USES
+        - name: DB_POSTGRESDB_SSL_ENABLED
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: DB_POSTGRESDB_SSL_ENABLED
+        - name: DB_POSTGRESDB_SSL_REJECT_UNAUTHORIZED
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: DB_POSTGRESDB_SSL_REJECT_UNAUTHORIZED
+        - name: DB_POSTGRESDB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: n8n-secrets
+              key: POSTGRES_PASSWORD
+        - name: N8N_ENCRYPTION_KEY
+          valueFrom:
+            secretKeyRef:
+              name: n8n-secrets
+              key: N8N_ENCRYPTION_KEY
+        - name: EXECUTIONS_MODE
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: EXECUTIONS_MODE
+        - name: QUEUE_BULL_REDIS_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: QUEUE_BULL_REDIS_HOST
+        - name: QUEUE_BULL_REDIS_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: QUEUE_BULL_REDIS_PORT
+        - name: QUEUE_BULL_REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: n8n-secrets
+              key: REDIS_PASSWORD
+        - name: QUEUE_BULL_REDIS_DB
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: QUEUE_BULL_REDIS_DB
+        - name: N8N_TRUST_PROXY
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: N8N_TRUST_PROXY
+        - name: NODE_TLS_REJECT_UNAUTHORIZED
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: NODE_TLS_REJECT_UNAUTHORIZED
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
+        startupProbe:
+          httpGet:
+            path: /healthz
+            port: 5678
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 30
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 5678
+          initialDelaySeconds: 0
+          periodSeconds: 30
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 5678
+          initialDelaySeconds: 0
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+
+---
+# n8n-webhook service
+apiVersion: v1
+kind: Service
+metadata:
+  name: n8n-webhook-service
+  namespace: n8n
+spec:
+  selector:
+    app: n8n-webhook
+  ports:
+  - name: http
+    port: 80
+    targetPort: 5678
+
+---
+# PostgreSQL and Redis StatefulSets removed - using HA versions in architecture namespace
+
+---
+# n8n-worker-hpa
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: n8n-worker-hpa
+  namespace: n8n
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: n8n-worker
+  minReplicas: 2
+  maxReplicas: 6
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+
+---
+# n8n-webhook-hpa
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: n8n-webhook-hpa
+  namespace: n8n
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: n8n-webhook
+  minReplicas: 2
+  maxReplicas: 8
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+
+---
+# n8n-ingress
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: n8n-ingress
+  namespace: n8n
+  annotations:
+    traefik.ingress.kubernetes.io/preserve-host: "true"
+spec:
+  ingressClassName: traefik-ingress
+  rules:
+  - host: auto.docaohieu.com
+    http:
+      paths:
+      # Webhook paths - route to webhook service
+      - path: /webhook
+        pathType: Prefix
+        backend:
+          service:
+            name: n8n-webhook-service
+            port:
+              number: 80
+      - path: /webhook-test
+        pathType: Prefix
+        backend:
+          service:
+            name: n8n-webhook-service
+            port:
+              number: 80
+      - path: /webhook-waiting
+        pathType: Prefix
+        backend:
+          service:
+            name: n8n-webhook-service
+            port:
+              number: 80
+      # All other paths - route to main service (UI)
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: n8n-main-service
+            port:
+              number: 80

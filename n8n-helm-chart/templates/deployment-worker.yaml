@@ -1,0 +1,151 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: n8n-worker
+  namespace: {{ .Values.global.namespace }}
+spec:
+  replicas: {{ .Values.worker.replicaCount }}
+  selector:
+    matchLabels:
+      app: n8n-worker
+  template:
+    metadata:
+      labels:
+        app: n8n-worker
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - n8n-worker
+              topologyKey: kubernetes.io/hostname
+      containers:
+      - name: n8n-worker
+        image: {{ .Values.worker.image.repository }}:{{ .Values.worker.image.tag }}
+        imagePullPolicy: {{ .Values.worker.image.pullPolicy }}
+        command: ["n8n"]
+        args: ["worker"]
+        env:
+        - name: GENERIC_TIMEZONE
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: GENERIC_TIMEZONE
+        - name: DB_TYPE
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: DB_TYPE
+        - name: DB_POSTGRESDB_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: DB_POSTGRESDB_HOST
+        - name: DB_POSTGRESDB_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: DB_POSTGRESDB_PORT
+        - name: DB_POSTGRESDB_DATABASE
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: DB_POSTGRESDB_DATABASE
+        - name: DB_POSTGRESDB_USER
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: DB_POSTGRESDB_USER
+        - name: DB_POSTGRESDB_SCHEMA
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: DB_POSTGRESDB_SCHEMA
+        - name: DB_POSTGRESDB_POOL_SIZE
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: DB_POSTGRESDB_POOL_SIZE
+        - name: DB_POSTGRESDB_MIN_POOL_SIZE
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: DB_POSTGRESDB_MIN_POOL_SIZE
+        - name: DB_POSTGRESDB_ACQUIRE_TIMEOUT_MILLIS
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: DB_POSTGRESDB_ACQUIRE_TIMEOUT_MILLIS
+        - name: DB_POSTGRESDB_CONNECTION_TIMEOUT_MILLIS
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: DB_POSTGRESDB_CONNECTION_TIMEOUT_MILLIS
+        - name: DB_POSTGRESDB_IDLE_TIMEOUT_MILLIS
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: DB_POSTGRESDB_IDLE_TIMEOUT_MILLIS
+        - name: DB_POSTGRESDB_MAX_USES
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: DB_POSTGRESDB_MAX_USES
+        - name: DB_POSTGRESDB_SSL_ENABLED
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: DB_POSTGRESDB_SSL_ENABLED
+        - name: DB_POSTGRESDB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: n8n-secrets
+              key: POSTGRES_PASSWORD
+        - name: N8N_ENCRYPTION_KEY
+          valueFrom:
+            secretKeyRef:
+              name: n8n-secrets
+              key: N8N_ENCRYPTION_KEY
+        - name: EXECUTIONS_MODE
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: EXECUTIONS_MODE
+        - name: QUEUE_BULL_REDIS_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: QUEUE_BULL_REDIS_HOST
+        - name: QUEUE_BULL_REDIS_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: QUEUE_BULL_REDIS_PORT
+        - name: QUEUE_BULL_REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: n8n-secrets
+              key: REDIS_PASSWORD
+        - name: QUEUE_BULL_REDIS_DB
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: QUEUE_BULL_REDIS_DB
+        - name: N8N_CONCURRENCY_PRODUCTION_LIMIT
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: N8N_CONCURRENCY_PRODUCTION_LIMIT
+        - name: NODE_TLS_REJECT_UNAUTHORIZED
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: NODE_TLS_REJECT_UNAUTHORIZED
+        resources:
+          {{- toYaml .Values.worker.resources | nindent 10 }}

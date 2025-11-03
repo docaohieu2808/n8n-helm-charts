@@ -1,0 +1,37 @@
+{{- if .Values.ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: n8n-ingress
+  namespace: {{ .Values.global.namespace }}
+  {{- with .Values.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  ingressClassName: {{ .Values.ingress.className }}
+  rules:
+  - host: {{ .Values.ingress.host }}
+    http:
+      paths:
+      {{- if .Values.webhook.enabled }}
+      # Webhook paths - route to webhook service
+      {{- range .Values.ingress.webhookPaths }}
+      - path: {{ . }}
+        pathType: Prefix
+        backend:
+          service:
+            name: n8n-webhook-service
+            port:
+              number: {{ $.Values.webhook.service.port }}
+      {{- end }}
+      {{- end }}
+      # All other paths - route to main service (UI)
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: n8n-main-service
+            port:
+              number: {{ .Values.main.service.port }}
+{{- end }}

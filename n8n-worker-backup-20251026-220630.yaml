@@ -1,0 +1,160 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "2"
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"n8n-worker","namespace":"n8n"},"spec":{"replicas":2,"selector":{"matchLabels":{"app":"n8n-worker"}},"template":{"metadata":{"labels":{"app":"n8n-worker"}},"spec":{"affinity":{"podAntiAffinity":{"preferredDuringSchedulingIgnoredDuringExecution":[{"podAffinityTerm":{"labelSelector":{"matchExpressions":[{"key":"app","operator":"In","values":["n8n-worker"]}]},"topologyKey":"kubernetes.io/hostname"},"weight":100}]}},"containers":[{"args":["worker"],"command":["n8n"],"env":[{"name":"GENERIC_TIMEZONE","valueFrom":{"configMapKeyRef":{"key":"GENERIC_TIMEZONE","name":"n8n-config"}}},{"name":"DB_TYPE","valueFrom":{"configMapKeyRef":{"key":"DB_TYPE","name":"n8n-config"}}},{"name":"DB_POSTGRESDB_HOST","valueFrom":{"configMapKeyRef":{"key":"DB_POSTGRESDB_HOST","name":"n8n-config"}}},{"name":"DB_POSTGRESDB_PORT","valueFrom":{"configMapKeyRef":{"key":"DB_POSTGRESDB_PORT","name":"n8n-config"}}},{"name":"DB_POSTGRESDB_DATABASE","valueFrom":{"configMapKeyRef":{"key":"DB_POSTGRESDB_DATABASE","name":"n8n-config"}}},{"name":"DB_POSTGRESDB_USER","valueFrom":{"configMapKeyRef":{"key":"DB_POSTGRESDB_USER","name":"n8n-config"}}},{"name":"DB_POSTGRESDB_PASSWORD","valueFrom":{"secretKeyRef":{"key":"POSTGRES_PASSWORD","name":"n8n-secrets"}}},{"name":"N8N_ENCRYPTION_KEY","valueFrom":{"secretKeyRef":{"key":"N8N_ENCRYPTION_KEY","name":"n8n-secrets"}}},{"name":"EXECUTIONS_MODE","valueFrom":{"configMapKeyRef":{"key":"EXECUTIONS_MODE","name":"n8n-config"}}},{"name":"QUEUE_BULL_REDIS_HOST","valueFrom":{"configMapKeyRef":{"key":"QUEUE_BULL_REDIS_HOST","name":"n8n-config"}}},{"name":"QUEUE_BULL_REDIS_PORT","valueFrom":{"configMapKeyRef":{"key":"QUEUE_BULL_REDIS_PORT","name":"n8n-config"}}},{"name":"QUEUE_BULL_REDIS_PASSWORD","valueFrom":{"secretKeyRef":{"key":"REDIS_PASSWORD","name":"n8n-secrets"}}},{"name":"QUEUE_BULL_REDIS_DB","valueFrom":{"configMapKeyRef":{"key":"QUEUE_BULL_REDIS_DB","name":"n8n-config"}}},{"name":"N8N_CONCURRENCY_PRODUCTION_LIMIT","valueFrom":{"configMapKeyRef":{"key":"N8N_CONCURRENCY_PRODUCTION_LIMIT","name":"n8n-config"}}}],"image":"n8nio/n8n:latest","name":"n8n-worker","resources":{"limits":{"cpu":"1000m","memory":"2Gi"},"requests":{"cpu":"500m","memory":"512Mi"}}}]}}}}
+  creationTimestamp: "2025-10-26T12:36:56Z"
+  generation: 2
+  name: n8n-worker
+  namespace: n8n
+  resourceVersion: "1841147"
+  uid: a616bb0c-e968-43f7-b66b-61cd15b19d8f
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 2
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: n8n-worker
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: n8n-worker
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - n8n-worker
+              topologyKey: kubernetes.io/hostname
+            weight: 100
+      containers:
+      - args:
+        - worker
+        command:
+        - n8n
+        env:
+        - name: GENERIC_TIMEZONE
+          valueFrom:
+            configMapKeyRef:
+              key: GENERIC_TIMEZONE
+              name: n8n-config
+        - name: DB_TYPE
+          valueFrom:
+            configMapKeyRef:
+              key: DB_TYPE
+              name: n8n-config
+        - name: DB_POSTGRESDB_HOST
+          valueFrom:
+            configMapKeyRef:
+              key: DB_POSTGRESDB_HOST
+              name: n8n-config
+        - name: DB_POSTGRESDB_PORT
+          valueFrom:
+            configMapKeyRef:
+              key: DB_POSTGRESDB_PORT
+              name: n8n-config
+        - name: DB_POSTGRESDB_DATABASE
+          valueFrom:
+            configMapKeyRef:
+              key: DB_POSTGRESDB_DATABASE
+              name: n8n-config
+        - name: DB_POSTGRESDB_USER
+          valueFrom:
+            configMapKeyRef:
+              key: DB_POSTGRESDB_USER
+              name: n8n-config
+        - name: DB_POSTGRESDB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: POSTGRES_PASSWORD
+              name: n8n-secrets
+        - name: N8N_ENCRYPTION_KEY
+          valueFrom:
+            secretKeyRef:
+              key: N8N_ENCRYPTION_KEY
+              name: n8n-secrets
+        - name: EXECUTIONS_MODE
+          valueFrom:
+            configMapKeyRef:
+              key: EXECUTIONS_MODE
+              name: n8n-config
+        - name: QUEUE_BULL_REDIS_HOST
+          valueFrom:
+            configMapKeyRef:
+              key: QUEUE_BULL_REDIS_HOST
+              name: n8n-config
+        - name: QUEUE_BULL_REDIS_PORT
+          valueFrom:
+            configMapKeyRef:
+              key: QUEUE_BULL_REDIS_PORT
+              name: n8n-config
+        - name: QUEUE_BULL_REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: REDIS_PASSWORD
+              name: n8n-secrets
+        - name: QUEUE_BULL_REDIS_DB
+          valueFrom:
+            configMapKeyRef:
+              key: QUEUE_BULL_REDIS_DB
+              name: n8n-config
+        - name: N8N_CONCURRENCY_PRODUCTION_LIMIT
+          valueFrom:
+            configMapKeyRef:
+              key: N8N_CONCURRENCY_PRODUCTION_LIMIT
+              name: n8n-config
+        - name: DB_POSTGRESDB_SSL_ENABLED
+          value: "true"
+        - name: DB_POSTGRESDB_SSL_REJECT_UNAUTHORIZED
+          value: "false"
+        - name: NODE_TLS_REJECT_UNAUTHORIZED
+          value: "0"
+        image: n8nio/n8n:latest
+        imagePullPolicy: Always
+        name: n8n-worker
+        resources:
+          limits:
+            cpu: "1"
+            memory: 2Gi
+          requests:
+            cpu: 500m
+            memory: 512Mi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+status:
+  availableReplicas: 2
+  conditions:
+  - lastTransitionTime: "2025-10-26T12:36:56Z"
+    lastUpdateTime: "2025-10-26T12:38:06Z"
+    message: ReplicaSet "n8n-worker-6bf7b8fd4" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  - lastTransitionTime: "2025-10-26T14:46:40Z"
+    lastUpdateTime: "2025-10-26T14:46:40Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  observedGeneration: 2
+  readyReplicas: 2
+  replicas: 2
+  updatedReplicas: 2

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>n8n Helm Charts Repository</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; }
+        code { background: #f4f4f4; padding: 2px 6px; border-radius: 3px; }
+        pre { background: #f4f4f4; padding: 15px; border-radius: 5px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>n8n Helm Charts Repository</h1>
+    <p>Repository chứa Helm charts cho n8n workflow automation platform.</p>
+
+    <h2>Cách sử dụng</h2>
+    <pre><code># Add repository
+helm repo add n8n https://&lt;username&gt;.github.io/n8n-helm-charts/charts
+helm repo update
+
+# Search charts
+helm search repo n8n
+
+# Install
+helm install my-n8n n8n/n8n -n n8n --create-namespace
+
+# Install với custom values
+helm install my-n8n n8n/n8n -n n8n -f custom-values.yaml
+</code></pre>
+
+    <h2>Available Charts</h2>
+    <ul>
+        <li><strong>n8n</strong> - n8n workflow automation with separate webhook service (v1.0.0)</li>
+    </ul>
+
+    <h2>Source Code</h2>
+    <p>Chart source: <a href="https://github.com/&lt;username&gt;/n8n-helm-charts">GitHub</a></p>
+</body>
+</html>

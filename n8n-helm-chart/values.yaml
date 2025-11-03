@@ -1,0 +1,192 @@
+# Default values for n8n
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# Global configuration
+global:
+  namespace: n8n
+
+# n8n main instance (UI/API)
+main:
+  replicaCount: 1
+  image:
+    repository: n8nio/n8n
+    tag: latest
+    pullPolicy: IfNotPresent
+
+  resources:
+    requests:
+      memory: "1Gi"
+      cpu: "1000m"
+    limits:
+      memory: "4Gi"
+      cpu: "2000m"
+
+  service:
+    type: ClusterIP
+    port: 80
+    targetPort: 5678
+    metricsPort: 9090
+
+# n8n webhook service
+webhook:
+  enabled: true
+  replicaCount: 2
+  image:
+    repository: n8nio/n8n
+    tag: latest
+    pullPolicy: IfNotPresent
+
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "500m"
+    limits:
+      memory: "2Gi"
+      cpu: "1000m"
+
+  service:
+    type: ClusterIP
+    port: 80
+    targetPort: 5678
+
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 8
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 80
+
+# n8n worker service
+worker:
+  replicaCount: 2
+  image:
+    repository: n8nio/n8n
+    tag: latest
+    pullPolicy: IfNotPresent
+
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "500m"
+    limits:
+      memory: "2Gi"
+      cpu: "1000m"
+
+  service:
+    type: ClusterIP
+    port: 5678
+    targetPort: 5678
+
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 6
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 80
+
+# Persistent storage
+persistence:
+  enabled: true
+  storageClassName: nfs-client
+  accessMode: ReadWriteOnce
+  size: 10Gi
+
+# n8n configuration
+config:
+  # Basic config
+  host: "auto.docaohieu.com"
+  port: "5678"
+  protocol: "https"
+  webhookUrl: "https://auto.docaohieu.com"
+  timezone: "Asia/Ho_Chi_Minh"
+
+  # Database config (PostgreSQL HA)
+  database:
+    type: "postgresdb"
+    host: "postgres-ha.database.svc.cluster.local"
+    port: "5432"
+    name: "n8n_postgres_db"
+    user: "n8n_postgres_user"
+    schema: "public"
+    # Connection Pool Optimization
+    poolSize: "20"
+    minPoolSize: "5"
+    acquireTimeoutMillis: "10000"
+    connectionTimeoutMillis: "5000"
+    idleTimeoutMillis: "30000"
+    maxUses: "7500"
+    # SSL config
+    sslEnabled: "true"
+    sslRejectUnauthorized: "false"
+
+  # Redis config (Redis HA)
+  redis:
+    host: "redis-ha-haproxy.database.svc.cluster.local"
+    port: "6379"
+    queueDb: "1"
+    cacheDb: "2"
+
+  # Execution config
+  executions:
+    mode: "queue"
+    dataSaveOnError: "all"
+    dataSaveOnSuccess: "none"
+    dataSaveManualExecutions: "true"
+    dataPresne: "true"
+    dataMaxAge: "336"
+
+  # Logging
+  logging:
+    level: "warn"
+    output: "console"
+
+  # Metrics
+  metrics:
+    enabled: "true"
+    includeDefaultMetrics: "true"
+    includeWorkflowIdLabel: "true"
+    includeNodeTypeLabel: "true"
+
+  # Performance
+  concurrencyProductionLimit: "10"
+
+  # Cache
+  cache:
+    enabled: "true"
+    jwtCacheEnabled: "true"
+
+  # Trust proxy
+  trustProxy: "1"
+
+  # Node TLS
+  nodeTlsRejectUnauthorized: "0"
+
+# Secrets (should be overridden in production)
+secrets:
+  postgresPassword: "zYaYeKf2CfVW1BuZ8o5vFWZBxRqf6eDLVIRkGK9M4V7LEtcCmPlJhZpDZgAYBuQ4"
+  postgresUser: "n8n_postgres_user"
+  postgresDb: "n8n_postgres_db"
+  encryptionKey: "54229fbc5059ba94d8d29665b3561b00915fed0441e8574a10e20532e46b5717"
+  redisPassword: "vqq0K67ONKCOuCIIMqQyyfeLANFqex4e8eI7AyVio5eUpuaULfenwIxW2I"
+  redisEncryptionKey: "082b643762a5d088cfaefc9f937e848dd26bef200615ae37d848b3e277263e65"
+
+# Ingress configuration
+ingress:
+  enabled: true
+  className: traefik-ingress
+  annotations:
+    traefik.ingress.kubernetes.io/preserve-host: "true"
+  host: auto.docaohieu.com
+  # Webhook paths (routed to webhook service)
+  webhookPaths:
+    - /webhook
+    - /webhook-test
+    - /webhook-waiting
+
+# Pod anti-affinity for high availability
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        topologyKey: kubernetes.io/hostname
