@@ -1,6 +1,10 @@
 # Claude Code settings
 .claude/
 
+# Local guides (not for public repo)
+HELM_REPO_SETUP.md
+GITHUB_PUSH_GUIDE.md
+
 # Backup files
 *.backup
 *-backup-*.yaml
