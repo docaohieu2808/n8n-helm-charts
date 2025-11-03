@@ -1,0 +1,28 @@
+# Claude Code settings
+.claude/
+
+# Backup files
+*.backup
+*-backup-*.yaml
+
+# OS files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# IDE
+.vscode/
+.idea/
+*.iml
+
+# Build artifacts (keep only in helm-repo/charts/)
+/*.tgz
+
+# Original deployment files (not needed in Helm repo)
+full-deployments.yaml
+
+# Temporary files
+*.tmp
+*.log
