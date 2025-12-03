@@ -11,7 +11,7 @@ main:
   replicaCount: 1
   image:
     repository: n8nio/n8n
-    tag: "1.123.1"
+    tag: "1.120.4"
     pullPolicy: IfNotPresent
 
   resources:
@@ -34,7 +34,7 @@ webhook:
   replicaCount: 2
   image:
     repository: n8nio/n8n
-    tag: "1.123.1"
+    tag: "1.120.4"
     pullPolicy: IfNotPresent
 
   resources:
@@ -62,7 +62,7 @@ worker:
   replicaCount: 2
   image:
     repository: n8nio/n8n
-    tag: "1.123.1"
+    tag: "1.120.4"
     pullPolicy: IfNotPresent
 
   resources:
@@ -118,7 +118,7 @@ config:
     maxUses: "7500"
     # SSL config
     sslEnabled: "true"
-    sslRejectUnauthorized: "true"
+    sslRejectUnauthorized: "false"
 
   # Redis config (Redis HA)
   redis:
@@ -133,7 +133,7 @@ config:
     dataSaveOnError: "all"
     dataSaveOnSuccess: "none"
     dataSaveManualExecutions: "true"
-    dataPrune: "true"
+    dataPresne: "true"
     dataMaxAge: "336"
 
   # Logging
@@ -160,7 +160,7 @@ config:
   trustProxy: "1"
 
   # Node TLS
-  nodeTlsRejectUnauthorized: "1"
+  nodeTlsRejectUnauthorized: "0"
 
 # Secrets (should be overridden in production)
 secrets:

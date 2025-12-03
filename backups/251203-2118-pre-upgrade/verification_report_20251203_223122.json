@@ -1,0 +1,30 @@
+{
+    "verification_timestamp": "2025-12-03T22:31:23+07:00",
+    "backup_directory": "/home/hieudc/n8n/backups/251203-2118-pre-upgrade",
+    "postgresql": {
+        "status": "PASSED",
+        "files_found": 3,
+        "files_expected": 3,
+        "total_size": "480K",
+        "sql_files": 1,
+        "dump_files": 0,
+        "metadata_files": 1,
+        "checksum_files": 2
+    },
+    "redis": {
+        "status": "PASSED",
+        "files_found": 2,
+        "files_expected": 2,
+        "total_size": "444K",
+        "rdb_files": 1,
+        "metadata_files": 1,
+        "key_count_files": 1,
+        "dump_files": 0,
+        "copy_scripts": 0,
+        "checksum_files": 0
+    },
+    "overall_status": "PASSED",
+    "total_backup_size": "1.0M",
+    "verification_log": "/home/hieudc/n8n/backups/251203-2118-pre-upgrade/verification_20251203_223122.log",
+    "ready_for_upgrade": true
+}

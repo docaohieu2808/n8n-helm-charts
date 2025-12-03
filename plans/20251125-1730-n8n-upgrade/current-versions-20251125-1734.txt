@@ -1,0 +1,3 @@
+n8n-main	n8nio/n8n:1.119.0
+n8n-webhook	n8nio/n8n:1.119.0
+n8n-worker	n8nio/n8n:1.119.0

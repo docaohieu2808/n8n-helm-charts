@@ -1,0 +1,19 @@
+{
+    "timestamp": "2025-12-03T22:00:49+07:00",
+    "database": "n8n_postgres_db",
+    "host": "postgres-ha.database.svc.cluster.local",
+    "port": "5432",
+    "user": "n8n_postgres_user",
+    "backup_files": {
+        "sql_backup": "n8n_postgres_backup_20251203_213925.sql",
+        "compressed_backup": "n8n_postgres_backup_20251203_213928.dump"
+    },
+    "file_sizes": {
+        "sql_backup": "247K",
+        "compressed_backup": "192K"
+    },
+    "database_size": "Unknown - backup executed via kubectl",
+    "compression_level": "9",
+    "purpose": "n8n upgrade pre-backup",
+    "backup_method": "kubectl exec inside PostgreSQL pod"
+}

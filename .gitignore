@@ -30,3 +30,12 @@ full-deployments.yaml
 # Temporary files
 *.tmp
 *.log
+
+# n8n WordPress Workflow - Sensitive data
+workflow-config.json
+results.json
+*.env
+.env.*
+
+# n8n WordPress Workflow - Keep examples only
+# keywords.json (comment out if you want to gitignore)

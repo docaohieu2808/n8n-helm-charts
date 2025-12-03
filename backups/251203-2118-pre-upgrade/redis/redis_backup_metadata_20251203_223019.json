@@ -1,0 +1,23 @@
+{
+    "timestamp": "2025-12-03T22:30:19+07:00",
+    "redis_server": "redis-ha-haproxy.database.svc.cluster.local:6379",
+    "redis_version": "8.2.2",
+    "memory_usage": "Unknown - backup executed via kubectl",
+    "total_keys": 2845,
+    "database_count": 3,
+    "rdb_file_location": "/data/dump.rdb",
+    "backup_files": {
+        "rdb_backup": "redis_backup_20251203_222611.rdb",
+        "key_counts": "key_count_20251203_223019.txt"
+    },
+    "file_sizes": {
+        "rdb_backup": "416K"
+    },
+    "purpose": "n8n upgrade pre-backup",
+    "backup_method": "kubectl copy from Redis pod",
+    "database_details": {
+        "db0": {"keys": 2612, "expires": 2576},
+        "db1": {"keys": 41, "expires": 5},
+        "db2": {"keys": 192, "expires": 0}
+    }
+}

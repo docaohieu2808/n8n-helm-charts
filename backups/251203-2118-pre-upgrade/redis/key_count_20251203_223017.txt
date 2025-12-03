@@ -1,0 +1,6 @@
+Redis Database Key Counts - Generated on Wed Dec  3 22:30:17 +07 2025
+Database 0: 2612 keys (2576 with expiry)
+Database 1: 41 keys (5 with expiry)
+Database 2: 192 keys (0 with expiry)
+Total Keys: 2845
+Total with Expiry: 2581

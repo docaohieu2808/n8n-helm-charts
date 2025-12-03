@@ -2,8 +2,8 @@ apiVersion: v2
 name: n8n
 description: A Helm chart for n8n workflow automation with separate webhook service
 type: application
-version: 1.0.4
-appVersion: "1.123.1"
+version: 1.0.1
+appVersion: "1.120.4"
 keywords:
   - n8n
   - workflow
